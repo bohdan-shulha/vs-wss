@@ -2,7 +2,7 @@
   "name": "wss",
   "displayName": "wss",
   "description": "Workspace Shared Settings",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.79.0"
   },
@@ -21,8 +21,12 @@
   "contributes": {
     "commands": [
       {
-        "command": "vs-wss.helloWorld",
-        "title": "Hello World"
+        "command": "wss.initialize",
+        "title": "Workspace Shared Settings: Initialize"
+      },
+      {
+        "command": "wss.applyWorkspaceSettings",
+        "title": "Workspace Shared Settings: Apply Workspace Settings"
       }
     ]
   },

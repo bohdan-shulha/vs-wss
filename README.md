@@ -1,16 +1,20 @@
+# Workspace Shared Settings
+
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+- Have you ever need to use ${workspaceFolder} in your settings.json?
+- Were you struggling to share settings with your team?
+- Do you have multiple devices running different OSes and you need the same settings everywhere?
 
-For example if there is an image subfolder under your extension project workspace:
+This extension is an answer to all these questions.
 
-\!\[feature X\]\(images/feature-x.png\)
+The long-awaited feature (since 2016 - [issue](https://github.com/Microsoft/vscode/issues/2809)) is finally here!
 
 ## Extension Settings
 
 This extension contributes the following settings:
 
-* `wss.workspaceHash`: The hash of the latest applied workspace settings file.
+- none at the moment. :)
 
 ## Known Issues
 
@@ -18,6 +22,20 @@ This is just a proof of concept, but it already works as of today. PRs are welco
 
 ## Release Notes
 
-### 1.0.0
+### 0.0.2
 
-Initial release of the extension - just a proof of concept.
+- Added a separate command to apply settings from `settings.workspace.json`.
+
+### 0.0.1
+
+- Initial release of the extension - just a proof of concept.
+
+## TODO
+
+- Add more substitutions.
+- Add environment variables substitutions.
+- Ask to apply new workspace settings after changing/syncing the settings.workspace.json file.
+- Add support for `workspace.local.json` (or `settings.local.json`) file, so that you don't need multiple extensions doing the same job.
+- Show .gitignore recommendations.
+- I18n.
+- Tests.

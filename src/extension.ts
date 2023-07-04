@@ -1,42 +1,21 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { checkFirstRun } from './commands/first-run';
-import { initialize } from './commands/initialize';
+import { askToInitialize, isFirstRun } from './activate';
+import { initialize } from './initialize';
+import { applyWorkspaceSettingsCmd } from './settings';
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+	if (isFirstRun()) {
+		askToInitialize();	
+	}
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "vs-wss" is now active!');
+	Object.entries({
+		"wss.initialize": initialize,
+		"wss.applyWorkspaceSettings": applyWorkspaceSettingsCmd,
+	}).forEach(([command, handler]) => {
+		const disposable = vscode.commands.registerCommand(command, handler);
 
-	checkFirstRun();
-	// vscode.commands.registerCommand('wss.checkFirstRun', checkFirstRun);
-	// vscode.commands.executeCommand('wss.checkFirstRun');
-
-	vscode.commands.registerCommand('wss.initialize', initialize);
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('wss.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		// vscode.window.showInformationMessage('Hello World from vs-wss!');
-		vscode.window.showQuickPick(["Apply", "Cancel"], {
-			placeHolder: "Select an option - placeholder",
-			title: "Select an option - title",
-		}).then((selection) => {
-			vscode.window.showInformationMessage(`You selected: ${selection}`, { title: "Test" }, { title: "Test 2"})
-				.then((selection) => {
-					vscode.window.showInformationMessage(`You selected: ${selection}`);
-				});
-		});
+		context.subscriptions.push(disposable);
 	});
-
-	context.subscriptions.push(disposable);
 }
 
 // This method is called when your extension is deactivated

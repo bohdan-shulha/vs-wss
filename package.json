@@ -1,6 +1,6 @@
 {
-  "name": "vs-wss",
-  "displayName": "vs-wss",
+  "name": "wss",
+  "displayName": "wss",
   "description": "Workspace Shared Settings",
   "version": "0.0.1",
   "engines": {

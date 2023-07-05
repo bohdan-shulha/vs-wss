@@ -4,7 +4,7 @@ import { initialize } from './initialize';
 import { applyWorkspaceSettingsCmd } from './settings';
 
 export function activate(context: vscode.ExtensionContext) {
-	if (isFirstRun()) {
+	if (isFirstRun() && vscode.workspace.workspaceFolders?.length) {
 		askToInitialize();	
 	}
 

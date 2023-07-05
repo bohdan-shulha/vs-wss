@@ -10,6 +10,18 @@ This extension is an answer to all these questions.
 
 The long-awaited feature (since 2016 - [issue](https://github.com/Microsoft/vscode/issues/2809)) is finally here!
 
+## Examples
+
+```
+// .vscode/settings.workspace.json
+{
+    "java.settings.url": "${workspaceFolder}/.vscode/org.eclipse.jdt.core.prefs",
+    "java.jdt.ls.java.home": "${env:JAVA_HOME}",
+    "some.other.pref": "hello ${env:NAME}",
+}
+
+```
+
 ## Extension Settings
 
 This extension contributes the following settings:
@@ -21,6 +33,10 @@ This extension contributes the following settings:
 This is just a proof of concept, but it already works as of today. PRs are welcome.
 
 ## Release Notes
+
+### 0.0.3
+
+- Added env vars substitution with `${env:VAR_NAME}` syntax.
 
 ### 0.0.2
 

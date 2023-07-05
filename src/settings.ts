@@ -16,6 +16,34 @@ async function askToRestart() {
     }
 }
 
+function substitutePredefinedVars(workspaceFolder: vscode.WorkspaceFolder, value: string) {
+    // FIXME: mb find a way to extract these variables from the vscode itself?
+    const variables = {
+        "${workspaceFolder}": workspaceFolder.uri.fsPath,
+    };
+
+    return Object.entries(variables).reduce((acc, [key, val]) => {
+        return acc.replace(key, val);
+    }, value);
+}
+
+const envVarsRe = /\$\{env:\w+\}/g;
+
+function substituteEnvVariables(value: string) {
+    const matches = value.match(envVarsRe);
+    if (!matches) {
+        return value;
+    }
+    
+    return matches.reduce((result, envVar) => {
+        const envVarName = envVar.slice(6, -1);
+
+        const envVarValue = process.env[envVarName] || "";
+
+        return result.replace(envVar, envVarValue);
+    }, value);
+}
+
 function substituteVariables(workspaceFolder: vscode.WorkspaceFolder, value: unknown): unknown {
     if (Array.isArray(value)) {
         return value.map((val) => substituteVariables(workspaceFolder, val));
@@ -34,14 +62,7 @@ function substituteVariables(workspaceFolder: vscode.WorkspaceFolder, value: unk
         return value;
     }
 
-    // FIXME: mb find a way to extract these variables from the vscode itself?
-    const variables = {
-        "${workspaceFolder}": workspaceFolder.uri.fsPath,
-    };
-
-    return Object.entries(variables).reduce((acc, [key, val]) => {
-        return acc.replace(key, val);
-    }, value);
+    return substituteEnvVariables(substitutePredefinedVars(workspaceFolder, value));
 }
 
 export async function applyWorkspaceSettingsCmd() {

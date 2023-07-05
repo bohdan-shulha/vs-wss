@@ -15,11 +15,15 @@ The long-awaited feature (since 2016 - [issue](https://github.com/Microsoft/vsco
 ```
 // .vscode/settings.workspace.json
 {
+    // Using built-in variable:
     "java.settings.url": "${workspaceFolder}/.vscode/org.eclipse.jdt.core.prefs",
-    "java.jdt.ls.java.home": "${env:JAVA_HOME}",
-    "some.other.pref": "hello ${env:NAME}",
-}
 
+    // Using environment variable:
+    "java.jdt.ls.java.home": "${env:JAVA_HOME}",
+
+    // Using command substitution:
+    "tool.root": "/usr/lib/$(tool --version)"
+}
 ```
 
 ## Extension Settings
@@ -32,7 +36,13 @@ This extension contributes the following settings:
 
 This is just a proof of concept, but it already works as of today. PRs are welcome.
 
+- Given property value `"$(echo \"Hello :)\")"` will be parsed incorrectly as `echo "Hello :` so that the execution will fail.
+
 ## Release Notes
+
+### 0.0.4
+
+- Added basic commands substitution with `$(command --flags)` syntax.
 
 ### 0.0.3
 
@@ -49,8 +59,8 @@ This is just a proof of concept, but it already works as of today. PRs are welco
 ## TODO
 
 - Add more substitutions.
-- Add environment variables substitutions.
 - Ask to apply new workspace settings after changing/syncing the settings.workspace.json file.
+- Show the diff between "current" and "future" settings.
 - Add support for `workspace.local.json` (or `settings.local.json`) file, so that you don't need multiple extensions doing the same job.
 - Show .gitignore recommendations.
 - I18n.

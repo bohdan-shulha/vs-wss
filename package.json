@@ -1,8 +1,9 @@
 {
   "name": "wss",
   "displayName": "Workspace Shared Settings",
-  "description": "This extension allows to share workspace settings between team members by substituting variables within the settings.json file.",
-  "version": "0.0.3",
+  "description": "Variable substitutions in settings.json.",
+  "icon": "assets/icon.png",
+  "version": "0.0.4",
   "engines": {
     "vscode": "^1.79.0"
   },

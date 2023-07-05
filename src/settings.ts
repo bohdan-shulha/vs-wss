@@ -3,6 +3,7 @@ import * as fs from "fs/promises";
 import * as path from "path";
 import { parse } from "jsonc-parser";
 import { fileExists } from './util';
+import { substituteCommands } from './substitute/commands';
 
 async function askToRestart() {
     const selection = await vscode.window.showInformationMessage(
@@ -44,16 +45,16 @@ function substituteEnvVariables(value: string) {
     }, value);
 }
 
-function substituteVariables(workspaceFolder: vscode.WorkspaceFolder, value: unknown): unknown {
+function substituteVariablesInValue(workspaceFolder: vscode.WorkspaceFolder, value: unknown): unknown {
     if (Array.isArray(value)) {
-        return value.map((val) => substituteVariables(workspaceFolder, val));
+        return value.map((val) => substituteVariablesInValue(workspaceFolder, val));
     }
 
     if (typeof value === 'object' && value !== null) {
         return Object.entries(value).reduce((acc, [key, val]) => {
             return {
                 ...acc,
-                [key]: substituteVariables(workspaceFolder, val),
+                [key]: substituteVariablesInValue(workspaceFolder, val),
             };
         }, {});
     }
@@ -63,6 +64,15 @@ function substituteVariables(workspaceFolder: vscode.WorkspaceFolder, value: unk
     }
 
     return substituteEnvVariables(substitutePredefinedVars(workspaceFolder, value));
+}
+
+function substituteVariables(workspaceFolder: vscode.WorkspaceFolder, settings: Record<string, unknown>): Record<string, unknown> {
+    return Object.entries(settings).reduce((acc, [key, val]) => {
+        return {
+            ...acc,
+            [key]: substituteVariablesInValue(workspaceFolder, val),
+        };
+    }, {});
 }
 
 export async function applyWorkspaceSettingsCmd() {
@@ -81,16 +91,25 @@ export async function applyWorkspaceSettingsCmd() {
             ? parse(await fs.readFile(workspaceSettingsFile, { encoding: "utf-8" }))
             : {};
 
-        Object.entries(workspaceSettings).forEach(([key, val]) => {
-            const value = substituteVariables(workspaceFolder, val);
+        const workspaceSettingsWithVars = substituteVariables(workspaceFolder, workspaceSettings);
 
-            vscode.workspace.getConfiguration().update(key, value, vscode.ConfigurationTarget.WorkspaceFolder);
+        try {
+            const workspaceSettingsWithCommands = await substituteCommands(workspaceSettingsWithVars);
 
-            settings[key] = value;
-        });
+            Object.entries(workspaceSettingsWithCommands).forEach(([key, value]) => {    
+                vscode.workspace.getConfiguration("settings", workspaceFolder).update(key, value, vscode.ConfigurationTarget.WorkspaceFolder);
+    
+                settings[key] = value;
+            });
+    
+            await fs.writeFile(settingsFile, JSON.stringify(settings, null, 4));
+        } catch (e) {
+            const errorMessage = e instanceof Error ? e.message : JSON.stringify(e);
 
-        await fs.writeFile(settingsFile, JSON.stringify(settings, null, 4));
+            vscode.window.showErrorMessage(`Failed to apply workspace settings: ${errorMessage}`);
+        }
     });
     
+    // FIXME: check if any settings were changed and ask to restart only in this case
     await askToRestart();
 }
